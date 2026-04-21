@@ -57,4 +57,3 @@ Therapy was too expensive so we made a card game instead.
 ---
 
 *Based on the original We're Not Really Strangers card game.  
-Franci Edition — because the original wasn't personal enough.*
