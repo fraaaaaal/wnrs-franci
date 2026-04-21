@@ -1,0 +1,602 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .game-root {
+    background: #0d0608;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Inter', sans-serif;
+    padding: clamp(1.2rem, 4vw, 2.5rem) clamp(1rem, 5vw, 2rem);
+  }
+
+  .top-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .game-title {
+    text-align: center;
+    margin-bottom: clamp(1rem, 3vh, 1.8rem);
+  }
+  .game-title .brand {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(12px, 2vw, 14px);
+    color: #c0848e;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .game-title .edition {
+    font-size: clamp(9px, 1.5vw, 11px);
+    color: #5a2830;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 420px;
+    margin-bottom: clamp(1rem, 3vh, 1.6rem);
+  }
+  .progress-bar-track {
+    flex: 1;
+    height: 2px;
+    background: #1e0810;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: #8b1e2f;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+  .progress-label {
+    font-size: 11px;
+    color: #5a2830;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    min-width: 44px;
+    text-align: right;
+  }
+
+  .level-tabs {
+    display: flex;
+    gap: clamp(4px, 1vw, 8px);
+    margin-bottom: clamp(1rem, 3vh, 1.8rem);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .level-tab {
+    padding: 5px clamp(10px, 2vw, 16px);
+    border-radius: 20px;
+    border: 1px solid #1e0810;
+    background: transparent;
+    color: #5a2830;
+    font-size: clamp(9px, 1.3vw, 11px);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .level-tab:hover { border-color: #8b1e2f; color: #c0848e; }
+  .level-tab.active { background: #8b1e2f; border-color: #8b1e2f; color: #fff; }
+
+  .card-stage {
+    width: 100%;
+    max-width: 420px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: clamp(1rem, 3vh, 1.8rem);
+  }
+
+  .card {
+    width: 100%;
+    min-height: clamp(240px, 40vh, 340px);
+    border-radius: 18px;
+    padding: clamp(1.4rem, 4vw, 2rem) clamp(1.4rem, 4vw, 2rem) clamp(1.2rem, 3vw, 1.6rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    border: 1px solid #2a1015;
+  }
+  .card.level1 { background: #8b1e2f; }
+  .card.level2 { background: #6b1525; }
+  .card.level3 { background: #3a0d18; }
+  .card.wildcard { background: #150608; border-color: #8b1e2f; }
+  .card.idle { background: #110508; border: 1px dashed #2a1015; }
+
+  .card-level-badge {
+    font-size: clamp(9px, 1.3vw, 10px);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    font-weight: 500;
+    margin-bottom: clamp(0.8rem, 2vh, 1.2rem);
+    align-self: flex-start;
+  }
+  .card.wildcard .card-level-badge { color: #8b1e2f; }
+
+  .card-question {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(18px, 3.5vw, 24px);
+    line-height: 1.45;
+    color: #fff;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0;
+  }
+  .card.wildcard .card-question { color: #e0a0a8; font-size: clamp(16px, 3vw, 20px); }
+
+  .card-footer {
+    font-size: clamp(8px, 1.2vw, 10px);
+    color: rgba(255,255,255,0.18);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: clamp(0.8rem, 2vh, 1.2rem);
+    align-self: center;
+  }
+  .card.wildcard .card-footer { color: #2a1015; }
+
+  .card-num-pill {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+  }
+  .card.wildcard .card-num-pill { color: #2a1015; }
+
+  .idle-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(15px, 2.5vw, 18px);
+    color: #7a3a44;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .bottom-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .btn-draw {
+    background: #8b1e2f;
+    color: #fff;
+    border: none;
+    border-radius: 40px;
+    padding: clamp(12px, 2vw, 15px) clamp(36px, 8vw, 56px);
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(16px, 2.5vw, 19px);
+    font-style: italic;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-draw:hover { background: #a82438; }
+  .btn-draw:active { transform: scale(0.97); }
+  .btn-draw:disabled { background: #1e0810; color: #3a1018; cursor: not-allowed; }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .btn-small {
+    background: transparent;
+    border: 1px solid #1e0810;
+    color: #5a2830;
+    border-radius: 20px;
+    padding: 6px 18px;
+    font-size: clamp(9px, 1.3vw, 11px);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .btn-small:hover { border-color: #8b1e2f; color: #c0848e; }
+
+  .done-card {
+    width: 100%;
+    min-height: clamp(240px, 40vh, 340px);
+    border-radius: 18px;
+    background: #150608;
+    border: 1px solid #2a1015;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    gap: 10px;
+  }
+  .done-card .big {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(22px, 4vw, 30px);
+    color: #c0848e;
+  }
+  .done-card .sub {
+    font-size: 11px;
+    color: #5a2830;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .card-anim { animation: cardIn 0.32s cubic-bezier(0.22,1,0.36,1); }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+</style>
+
+<h2 class="sr-only">We're Not Really Strangers — Franci Edition interactive card game</h2>
+
+<div class="game-root">
+
+  <div class="top-section">
+    <div class="game-title">
+      <div class="brand">We're Not Really Strangers</div>
+      <div class="edition">Franci Edition</div>
+    </div>
+
+    <div class="progress-row">
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="prog-fill"></div></div>
+      <div class="progress-label" id="prog-label">0 / 213</div>
+    </div>
+
+    <div class="level-tabs">
+      <button class="level-tab active" onclick="setFilter('all')" id="tab-all">All</button>
+      <button class="level-tab" onclick="setFilter('1')" id="tab-1">Level 1</button>
+      <button class="level-tab" onclick="setFilter('2')" id="tab-2">Level 2</button>
+      <button class="level-tab" onclick="setFilter('3')" id="tab-3">Level 3</button>
+      <button class="level-tab" onclick="setFilter('w')" id="tab-w">Wild</button>
+    </div>
+  </div>
+
+  <div class="card-stage" id="card-stage">
+    <div class="card idle">
+      <div class="idle-text">Press the button below<br>to draw your first card</div>
+    </div>
+  </div>
+
+  <div class="bottom-section">
+    <button class="btn-draw" id="btn-draw" onclick="drawCard()">Draw a card</button>
+    <div class="btn-row">
+      <button class="btn-small" onclick="resetGame()">Restart</button>
+      <button class="btn-small" onclick="skipCard()">Skip</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const ALL_CARDS = [
+  {l:"1",q:"What's the first thing you noticed about me?"},
+  {l:"1",q:"Do I look kind? Explain."},
+  {l:"1",q:"Finish the sentence: just by looking at you I'd think ___."},
+  {l:"1",q:"What was your first impression of me?"},
+  {l:"1",q:"What was your first impression of me online vs IRL?"},
+  {l:"1",q:"What does my Instagram tell you about me?"},
+  {l:"1",q:"What about me intrigues you?"},
+  {l:"1",q:"Make an assumption about me."},
+  {l:"1",q:"What assumption did you make about me that turned out to be false?"},
+  {l:"1",q:"How would you describe what you think my type is in three words?"},
+  {l:"1",q:"Do I seem like someone who would get a name tattooed on myself? Why or why not?"},
+  {l:"1",q:"Do I seem like more of a creative or analytical type? Explain."},
+  {l:"1",q:"What do my shoes tell you about me?"},
+  {l:"1",q:"How would the person closest to you describe you in three words?"},
+  {l:"1",q:"What type of social situation makes you feel the most awkward?"},
+  {l:"1",q:"If you were to buy me a present, knowing nothing about me other than what I look like, what would it be?"},
+  {l:"1",q:"On a scale of 1–10, how messy do you think my car is? Explain."},
+  {l:"1",q:"Do you think plants thrive or die in my care? Explain."},
+  {l:"1",q:"What do you think I'm most likely to splurge on?"},
+  {l:"1",q:"As a child, what do you think I wanted to be?"},
+  {l:"1",q:"Do you think I was popular in school? Explain."},
+  {l:"1",q:"Do I seem like a coffee or tea person — sweetened or unsweetened?"},
+  {l:"1",q:"Do I seem like a morning person or a night owl?"},
+  {l:"1",q:"Do you think I'm usually early, on time, or late to events? Explain."},
+  {l:"1",q:"What compliment do you think I hear the most?"},
+  {l:"1",q:"Do you think I fall in love easily? Why or why not?"},
+  {l:"1",q:"What do you think is the hardest part of what I do for a living?"},
+  {l:"1",q:"Do I remind you of anyone you know?"},
+  {l:"1",q:"Do I intimidate you? Why or why not?"},
+  {l:"1",q:"Am I someone you typically connect with?"},
+  {l:"1",q:"Do you think I've ever been fired from a job? If so, what for?"},
+  {l:"1",q:"How many speeding tickets do you think I've gotten in my life?"},
+  {l:"1",q:"Do you think I ever checked an ex's phone for evidence?"},
+  {l:"1",q:"What subject do you think I thrived at in school? Did I fail any?"},
+  {l:"1",q:"How important do you think birthdays and holidays are to me? Explain."},
+  {l:"1",q:"What do you think I have been binge watching lately?"},
+  {l:"1",q:"What time do you think I have been waking up these days?"},
+  {l:"1",q:"What do you think has been my go-to snack lately?"},
+  {l:"1",q:"Do you think I am mainly cooking or getting takeout nowadays?"},
+  {l:"1",q:"Who do you think was more nervous on our first date? Explain."},
+  {l:"1",q:"Between the two of us, who seems like the better texter? Explain."},
+  {l:"1",q:"What did you think about my first message?"},
+  {l:"2",q:"What's been your happiest memory this past year?"},
+  {l:"2",q:"What has been your earliest recollection of happiness?"},
+  {l:"2",q:"What is your favorite memory from your childhood?"},
+  {l:"2",q:"What lesson took you the longest to un-learn?"},
+  {l:"2",q:"Are you lying to yourself about anything?"},
+  {l:"2",q:"What questions are you trying to answer most in your life right now?"},
+  {l:"2",q:"When was the last time you surprised yourself?"},
+  {l:"2",q:"What title would you give this chapter of your life?"},
+  {l:"2",q:"What do you crave more of?"},
+  {l:"2",q:"Finish the sentence: strangers would describe me as ___ only I know that I am ___."},
+  {l:"2",q:"What's the worst pain you've ever been in that wasn't physical?"},
+  {l:"2",q:"Has a stranger ever changed your life?"},
+  {l:"2",q:"What would your younger self not believe about your life today?"},
+  {l:"2",q:"What is a dream you let go of?"},
+  {l:"2",q:"If you could get to know someone in your life on a deeper level, who would it be and why?"},
+  {l:"2",q:"What part of your life works? What part of your life hurts?"},
+  {l:"2",q:"Do you think the image you have of yourself matches how others see you?"},
+  {l:"2",q:"Are you missing anyone right now? Do you think they miss you too?"},
+  {l:"2",q:"When you're asked 'how are you', how often do you answer truthfully?"},
+  {l:"2",q:"How are you, really?"},
+  {l:"2",q:"What's the most unexplainable thing that has happened to you?"},
+  {l:"2",q:"What did the people who raised you teach you about love?"},
+  {l:"2",q:"What dating advice would you give your younger self?"},
+  {l:"2",q:"How old do you feel emotionally?"},
+  {l:"2",q:"What's the most embarrassing thing that happened to you on a date?"},
+  {l:"2",q:"What could you have done better in previous relationships?"},
+  {l:"2",q:"Is there an image of yourself you try to project on a first date you wish you could let go of?"},
+  {l:"2",q:"What are you passionate about?"},
+  {l:"2",q:"What are you not currently giving enough time to?"},
+  {l:"2",q:"What has being single taught you about yourself?"},
+  {l:"2",q:"What's your least favorite question to be asked on a date? What do you wish you'd be asked more?"},
+  {l:"2",q:"If you could have it your way: who would you be with? Where? What would you be doing?"},
+  {l:"2",q:"Describe your perfect day."},
+  {l:"2",q:"Describe your perfect date."},
+  {l:"2",q:"What's your father's name? Tell me one thing about him."},
+  {l:"2",q:"What's your mom's name? What is the most beautiful thing about her?"},
+  {l:"2",q:"How can you become a better person?"},
+  {l:"2",q:"What takes someone from a friend to a best friend for you?"},
+  {l:"2",q:"Has a quote ever changed your world view? Which one?"},
+  {l:"2",q:"What have you let go of this year that's made a positive change in your life?"},
+  {l:"2",q:"What would feel best to fully accept in this current moment?"},
+  {l:"2",q:"What are you most excited for today? Big or small."},
+  {l:"2",q:"What's the most fun you've had lately?"},
+  {l:"2",q:"What's been the hardest part of all this for you? Permission to vent."},
+  {l:"2",q:"What's been the kindest thing someone has done for you?"},
+  {l:"2",q:"What has been the kindest thing you have done for yourself in the last month?"},
+  {l:"2",q:"What are you better at than most people you know? Permission to brag."},
+  {l:"2",q:"If money was not an issue, what is one big dream or idea you would execute this year?"},
+  {l:"2",q:"What's the most valuable lesson this time has taught you so far?"},
+  {l:"2",q:"What movie do you wish you'd never seen so you could watch it for the first time with me?"},
+  {l:"2",q:"What do you wish you could spend more time doing?"},
+  {l:"2",q:"Something that brought a smile to my face this week was ___."},
+  {l:"2",q:"What's your first love's name and the reason you fell in love with them?"},
+  {l:"2",q:"Will I find your ex on your Instagram feed? Why or why not?"},
+  {l:"2",q:"What about my profile made you swipe right?"},
+  {l:"2",q:"Finish the sentence: dating is ___ (both players)."},
+  {l:"2",q:"On a scale of 1–10, how open do you feel I am with you? Explain."},
+  {l:"2",q:"What would a day of completely spoiling me look like?"},
+  {l:"2",q:"The hardest thing for me to reveal about myself to you was ___."},
+  {l:"2",q:"How does one earn your trust? Have I earned it? How can I earn more?"},
+  {l:"2",q:"What did our worst argument teach you?"},
+  {l:"2",q:"What has this relationship taught you about yourself?"},
+  {l:"2",q:"What's the most romantic thing I've done for you recently?"},
+  {l:"2",q:"What are you currently working through that I don't see, if anything?"},
+  {l:"2",q:"What's one small way I can be a better partner?"},
+  {l:"2",q:"What song best describes our relationship?"},
+  {l:"2",q:"What's the most attractive thing I do without realizing it?"},
+  {l:"2",q:"Do you think my job affects me positively or negatively? How does it affect us?"},
+  {l:"2",q:"What have you been extra sensitive to lately?"},
+  {l:"2",q:"What's the best gift I've given you? Material and immaterial?"},
+  {l:"2",q:"What feelings are hard for you to communicate to me? How can I make it easier?"},
+  {l:"2",q:"What about you feels hardest to love?"},
+  {l:"2",q:"What immediately attracted you to me? What attracted you more over time?"},
+  {l:"2",q:"What do you wish we did more of?"},
+  {l:"2",q:"What made you fall in love with me?"},
+  {l:"2",q:"What's the most important lesson a past relationship has taught you?"},
+  {l:"2",q:"Finish the sentence: thank you for accepting ___."},
+  {l:"2",q:"Are there any insecurities from previous relationships that you carried into this one? If so, what are they?"},
+  {l:"2",q:"What have I helped you appreciate about yourself?"},
+  {l:"2",q:"What recent experience made you feel closer to me?"},
+  {l:"2",q:"How do I show that I love you without telling you?"},
+  {l:"2",q:"When was the last time I hurt you, perhaps unintentionally?"},
+  {l:"2",q:"What fear do you think holds me back the most?"},
+  {l:"2",q:"How have you seen me grow in this relationship?"},
+  {l:"2",q:"What's one small way we can improve our sex life?"},
+  {l:"2",q:"Have I helped you change your mind about anything?"},
+  {l:"2",q:"How does our age difference, or lack thereof, affect us? If at all?"},
+  {l:"2",q:"How do our strengths and weaknesses complement each other?"},
+  {l:"3",q:"Based on what you learned about me, what would you recommend I read?"},
+  {l:"3",q:"What about me surprised you?"},
+  {l:"3",q:"Based on what you know about me, do you have a Netflix recommendation?"},
+  {l:"3",q:"What do you think my superpower is?"},
+  {l:"3",q:"What do you think our most important similarities are?"},
+  {l:"3",q:"What do you think is one thing I could do that would drastically improve my life?"},
+  {l:"3",q:"What would be the perfect gift for me?"},
+  {l:"3",q:"How would you describe me to a stranger?"},
+  {l:"3",q:"How would you describe me to your family?"},
+  {l:"3",q:"What do I need to hear right now?"},
+  {l:"3",q:"Based on what you've learned about me, does my social media portray me accurately?"},
+  {l:"3",q:"What is a lesson you will take away from our conversation?"},
+  {l:"3",q:"What can I help you with?"},
+  {l:"3",q:"What do you think I fear the most?"},
+  {l:"3",q:"Where am I most qualified to give advice?"},
+  {l:"3",q:"What about me is the hardest for you to understand?"},
+  {l:"3",q:"Admit something."},
+  {l:"3",q:"What parts of yourself do you see in me?"},
+  {l:"3",q:"How does one earn your vulnerability?"},
+  {l:"3",q:"What do you recommend I let go of?"},
+  {l:"3",q:"What has this conversation taught you about yourself?"},
+  {l:"3",q:"What do you think my defining characteristic is?"},
+  {l:"3",q:"What question were you most afraid to answer?"},
+  {l:"3",q:"Why do you think we met?"},
+  {l:"3",q:"When this game is over, what will you remember about me?"},
+  {l:"3",q:"What do you think my weakness is?"},
+  {l:"3",q:"How do our personalities complement each other?"},
+  {l:"3",q:"What do you think I should know about myself that I'm perhaps unaware of?"},
+  {l:"3",q:"What would make you feel closer to me?"},
+  {l:"3",q:"What do you admire most about me?"},
+  {l:"3",q:"What can we create together?"},
+  {l:"3",q:"What answer of mine made you light up?"},
+  {l:"3",q:"What's the most attractive quality about me that isn't physical?"},
+  {l:"3",q:"Am I like you expected me to be?"},
+  {l:"3",q:"What is one part of your personality you do not use often?"},
+  {l:"3",q:"If you made a playlist for me, what 3 songs would be on it?"},
+  {l:"3",q:"What did you learn about yourself while playing this game?"},
+  {l:"3",q:"What did I help you learn about yourself?"},
+  {l:"3",q:"How can I best be here for you during this season of life?"},
+  {l:"3",q:"Do you believe everyone has a calling? If so, do you think I've found mine?"},
+  {l:"3",q:"In one word, describe how you feel right now."},
+  {l:"3",q:"What answer of mine surprised you the most throughout this game, if any?"},
+  {l:"3",q:"What don't I give myself enough credit for?"},
+  {l:"3",q:"Is there anything you still don't know about me that you wish you did?"},
+  {l:"3",q:"What about our relationship are you proudest of?"},
+  {l:"3",q:"What did this conversation teach you about our relationship? What did it teach you about yourself?"},
+  {l:"3",q:"What goal would feel best for you to accomplish this year? How can I support you in that?"},
+  {l:"3",q:"Thank you for helping me realize ___ about myself."},
+  {l:"w",q:"Write down your number one goal for the next month. Compare."},
+  {l:"w",q:"Ask and answer the next question in a different accent."},
+  {l:"w",q:"Create your own question."},
+  {l:"w",q:"Write down the three most important things to you in a relationship (30 sec). Compare."},
+  {l:"w",q:"Write down a dating pet peeve (30 sec). Compare."},
+  {l:"w",q:"Draw your current mood. Compare."},
+  {l:"w",q:"Staring contest. First to smile must reveal what their room looks like right now."},
+  {l:"w",q:"What is one positive and one negative thing about me?"},
+  {l:"w",q:"What makes you the happiest?"},
+  {l:"w",q:"What's something you love about yourself?"},
+  {l:"w",q:"Share your most played song at the moment."},
+  {l:"w",q:"What is your biggest turn-off?"},
+  {l:"w",q:"What's one thing you're insecure about?"},
+  {l:"w",q:"What's something you're thankful for?"},
+  {l:"w",q:"When was the last time you cried and why?"},
+  {l:"w",q:"Show the first photo in your camera roll. Explain."},
+  {l:"w",q:"Think of something you dislike that most people don't. On the count of 3, say it out loud."},
+  {l:"w",q:"Share a favorite memory of yours. Compare. (Both)"},
+  {l:"w",q:"Take a selfie together."},
+  {l:"w",q:"What's your favorite song lyric that comes to mind right now?"},
+  {l:"w",q:"Each person writes a message to the other — don't read it out loud. Exchange."},
+  {l:"w",q:"Based on what you learned, rewrite each other's dating app bios. (30 sec)"},
+  {l:"w",q:"Draw your favorite memory with me. Compare."},
+  {l:"w",q:"If we were a band, what would our name be?"},
+  {l:"w",q:"Dare your partner to do something out of their comfort zone next week."},
+  {l:"w",q:"Write down one small way you can be better in this relationship. Both players. Compare."},
+  {l:"w",q:"On a scale of 1–10, write down the importance of having kids to you. Compare and explain."},
+  {l:"w",q:"Write down the top 3 things your partner does that make you feel most loved. Both players. Compare."},
+  {l:"w",q:"Write a short guide of how to love your partner well. 30 seconds. Compare."},
+  {l:"w",q:"Write a love song for your partner. 1 minute. Perform for each other."},
+  {l:"w",q:"Draw one of your favorite memories from our relationship. 30 seconds. Compare."},
+  {l:"w",q:"Write down the title you would give this chapter of our relationship. Compare."},
+  {l:"w",q:"Ask your partner something you've never asked them before."},
+  {l:"w",q:"Write down the top 3 things you're most grateful for in your partner. 30 seconds. Compare."},
+  {l:"w",q:"Write down your intention for our relationship. Compare."},
+];
+
+const LEVEL_LABELS = {'1':'Level 1 — Perception','2':'Level 2 — Connection','3':'Level 3 — Reflection','w':'Wildcard'};
+const LEVEL_CLASSES = {'1':'level1','2':'level2','3':'level3','w':'wildcard'};
+
+let remaining = [...ALL_CARDS];
+let drawn = 0;
+let filter = 'all';
+let currentCard = null;
+const TOTAL = ALL_CARDS.length;
+
+function getPool() {
+  return filter === 'all' ? remaining : remaining.filter(c => c.l === filter);
+}
+
+function updateProgress() {
+  const pct = Math.round((drawn / TOTAL) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = drawn + ' / ' + TOTAL;
+}
+
+function drawCard() {
+  const pool = getPool();
+  if (pool.length === 0) { showDone(); return; }
+  const idx = Math.floor(Math.random() * pool.length);
+  currentCard = pool[idx];
+  remaining = remaining.filter(c => c !== currentCard);
+  drawn++;
+  renderCard(currentCard);
+  updateProgress();
+  const btn = document.getElementById('btn-draw');
+  if (getPool().length === 0) { btn.disabled = true; btn.textContent = 'All done!'; }
+}
+
+function skipCard() {
+  if (!currentCard) return;
+  remaining.push(currentCard);
+  drawn--;
+  currentCard = null;
+  updateProgress();
+  document.getElementById('card-stage').innerHTML = '<div class="card idle"><div class="idle-text">Card skipped —<br>draw again</div></div>';
+  const btn = document.getElementById('btn-draw');
+  btn.disabled = false; btn.textContent = 'Draw a card';
+}
+
+function renderCard(card) {
+  const stage = document.getElementById('card-stage');
+  const cls = LEVEL_CLASSES[card.l];
+  stage.innerHTML = `<div class="card ${cls} card-anim">
+    <div class="card-level-badge">${LEVEL_LABELS[card.l]}</div>
+    <div class="card-question">${card.q}</div>
+    <div class="card-footer">We Are Not Really Strangers · Franci Edition</div>
+    <div class="card-num-pill">#${drawn}</div>
+  </div>`;
+}
+
+function showDone() {
+  document.getElementById('card-stage').innerHTML = '<div class="done-card"><div class="big">That\'s all of them.</div><div class="sub">213 cards · Franci Edition</div></div>';
+  const btn = document.getElementById('btn-draw');
+  btn.disabled = true; btn.textContent = 'Deck complete';
+}
+
+function setFilter(f) {
+  filter = f;
+  ['all','1','2','3','w'].forEach(k => {
+    const t = document.getElementById('tab-' + k);
+    if (t) t.classList.toggle('active', k === f);
+  });
+}
+
+function resetGame() {
+  remaining = [...ALL_CARDS]; drawn = 0; currentCard = null;
+  updateProgress();
+  document.getElementById('card-stage').innerHTML = '<div class="card idle"><div class="idle-text">Deck reset —<br>ready to play</div></div>';
+  const btn = document.getElementById('btn-draw');
+  btn.disabled = false; btn.textContent = 'Draw a card';
+}
+
+updateProgress();
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.body.style.margin = '0';
+  document.body.style.background = '#0d0608';
+  document.documentElement.style.background = '#0d0608';
+});
+</script>
