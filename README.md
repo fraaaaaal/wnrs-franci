@@ -1,5 +1,4 @@
-# wnrs-franci
-A card game for people who are tired of 'so what do you do for work.' Franci Edition 
+#### A card game for people who are tired of 'so what do you do for work.' 
 # We're Not Really Strangers — Franci Edition 🃏
 
 > *"Either you'll leave knowing everything about each other — or you'll leave 
